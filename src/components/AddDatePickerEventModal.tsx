@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { DatePickerEventFormData, ITodo } from "./EventCalendar"
+import { DatePickerEventFormData, ISession } from "./EventCalendar"
 
 interface IProps {
   open: boolean
@@ -22,7 +22,7 @@ interface IProps {
   datePickerEventFormData: DatePickerEventFormData
   setDatePickerEventFormData: Dispatch<SetStateAction<DatePickerEventFormData>>
   onAddEvent: (e: MouseEvent<HTMLButtonElement>) => void
-  todos: ITodo[]
+  sessions: ISession[]
 }
 
 const AddDatePickerEventModal = ({
@@ -31,7 +31,7 @@ const AddDatePickerEventModal = ({
   datePickerEventFormData,
   setDatePickerEventFormData,
   onAddEvent,
-  todos,
+  sessions,
 }: IProps) => {
   const { description, start, end, allDay } = datePickerEventFormData
 
@@ -53,10 +53,10 @@ const AddDatePickerEventModal = ({
     }))
   }
 
-  const handleTodoChange = (e: React.SyntheticEvent, value: ITodo | null) => {
+  const handleSessionOnChange = (e: React.SyntheticEvent, value: ISession | null) => {
     setDatePickerEventFormData((prevState) => ({
       ...prevState,
-      todoId: value?._id,
+      sessionId: value?._id,
     }))
   }
 
@@ -74,7 +74,7 @@ const AddDatePickerEventModal = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Add event</DialogTitle>
+      <DialogTitle>Add Session</DialogTitle>
       <DialogContent>
         <DialogContentText>To add a event, please fill in the information below.</DialogContentText>
         <Box component="form">
@@ -130,13 +130,13 @@ const AddDatePickerEventModal = ({
             />
           </LocalizationProvider>
           <Autocomplete
-            onChange={handleTodoChange}
+            onChange={handleSessionOnChange}
             disablePortal
             id="combo-box-demo"
-            options={todos}
+            options={sessions}
             sx={{ marginTop: 4 }}
             getOptionLabel={(option) => option.title}
-            renderInput={(params) => <TextField {...params} label="Todo" />}
+            renderInput={(params) => <TextField {...params} label="Session" />}
           />
         </Box>
       </DialogContent>

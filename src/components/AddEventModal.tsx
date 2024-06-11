@@ -10,7 +10,7 @@ import {
   Autocomplete,
   Box,
 } from "@mui/material"
-import { EventFormData, ITodo } from "./EventCalendar"
+import { EventFormData, ISession } from "./EventCalendar"
 
 interface IProps {
   open: boolean
@@ -18,10 +18,10 @@ interface IProps {
   eventFormData: EventFormData
   setEventFormData: Dispatch<SetStateAction<EventFormData>>
   onAddEvent: (e: MouseEvent<HTMLButtonElement>) => void
-  todos: ITodo[]
+  sessions: ISession[]
 }
 
-const AddEventModal = ({ open, handleClose, eventFormData, setEventFormData, onAddEvent, todos }: IProps) => {
+const AddEventModal = ({ open, handleClose, eventFormData, setEventFormData, onAddEvent, sessions }: IProps) => {
   const { description } = eventFormData
 
   const onClose = () => handleClose()
@@ -33,10 +33,10 @@ const AddEventModal = ({ open, handleClose, eventFormData, setEventFormData, onA
     }))
   }
 
-  const handleTodoChange = (e: React.SyntheticEvent, value: ITodo | null) => {
+  const handleSessionOnChange = (e: React.SyntheticEvent, value: ISession | null) => {
     setEventFormData((prevState) => ({
       ...prevState,
-      todoId: value?._id,
+      sessionId: value?._id,
     }))
   }
 
@@ -58,13 +58,13 @@ const AddEventModal = ({ open, handleClose, eventFormData, setEventFormData, onA
             onChange={onChange}
           />
           <Autocomplete
-            onChange={handleTodoChange}
+            onChange={handleSessionOnChange}
             disablePortal
             id="combo-box-demo"
-            options={todos}
+            options={sessions}
             sx={{ marginTop: 4 }}
             getOptionLabel={(option) => option.title}
-            renderInput={(params) => <TextField {...params} label="Todo" />}
+            renderInput={(params) => <TextField {...params} label="Session" />}
           />
         </Box>
       </DialogContent>

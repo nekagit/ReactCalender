@@ -1,25 +1,34 @@
-import { Box, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Divider } from "@mui/material"
-import { MouseEvent, useState } from "react"
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardHeader,
+  Container,
+  Divider,
+} from "@mui/material";
+import { MouseEvent, useState } from "react";
 
-import { Calendar, type Event, dateFnsLocalizer } from "react-big-calendar"
+import { Calendar, type Event, dateFnsLocalizer } from "react-big-calendar";
 
-import format from "date-fns/format"
-import getDay from "date-fns/getDay"
-import enUS from "date-fns/locale/en-US"
-import parse from "date-fns/parse"
-import startOfWeek from "date-fns/startOfWeek"
+import format from "date-fns/format";
+import getDay from "date-fns/getDay";
+import enUS from "date-fns/locale/en-US";
+import parse from "date-fns/parse";
+import startOfWeek from "date-fns/startOfWeek";
 
-import "react-big-calendar/lib/css/react-big-calendar.css"
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
-import AddDatePickerEventModal from "./AddDatePickerEventModal"
-import AddEventModal from "./AddEventModal"
-import { AddTodoModal } from "./AddTodoModal"
-import EventInfo from "./EventInfo"
-import EventInfoModal from "./EventInfoModal"
+import AddDatePickerEventModal from "./AddDatePickerEventModal";
+import AddEventModal from "./AddEventModal";
+import { AddSessionModal } from "./AddSessionModal";
+import EventInfo from "./EventInfo";
+import EventInfoModal from "./EventInfoModal";
 
 const locales = {
   "en-US": enUS,
-}
+};
 
 const localizer = dateFnsLocalizer({
   format,
@@ -27,112 +36,117 @@ const localizer = dateFnsLocalizer({
   startOfWeek,
   getDay,
   locales,
-})
+});
 
-export interface ITodo {
-  _id: string
-  title: string
-  color?: string
+export interface ISession {
+  _id: string;
+  title: string;
+  color?: string;
 }
 
 export interface IEventInfo extends Event {
-  _id: string
-  description: string
-  todoId?: string
+  _id: string;
+  description: string;
+  sessionId?: string;
 }
 
 export interface EventFormData {
-  description: string
-  todoId?: string
+  description: string;
+  sessionId?: string;
 }
 
 export interface DatePickerEventFormData {
-  description: string
-  todoId?: string
-  allDay: boolean
-  start?: Date
-  end?: Date
+  description: string;
+  sessionId?: string;
+  allDay: boolean;
+  start?: Date;
+  end?: Date;
 }
 
-export const generateId = () => (Math.floor(Math.random() * 10000) + 1).toString()
+export const generateId = () =>
+  (Math.floor(Math.random() * 10000) + 1).toString();
 
 const initialEventFormState: EventFormData = {
   description: "",
-  todoId: undefined,
-}
+  sessionId: undefined,
+};
 
 const initialDatePickerEventFormData: DatePickerEventFormData = {
   description: "",
-  todoId: undefined,
+  sessionId: undefined,
   allDay: false,
   start: undefined,
   end: undefined,
-}
+};
 
-export default function EventCalendar ()  {
-  const [openSlot, setOpenSlot] = useState(false)
-  const [openDatepickerModal, setOpenDatepickerModal] = useState(false)
-  const [openTodoModal, setOpenTodoModal] = useState(false)
-  const [currentEvent, setCurrentEvent] = useState<Event | IEventInfo | null>(null)
+export default function EventCalendar() {
+  const [openSlot, setOpenSlot] = useState(false);
+  const [openDatepickerModal, setOpenDatepickerModal] = useState(false);
+  const [opneSessionModal, setOpenSessionModal] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event | IEventInfo | null>(
+    null
+  );
 
-  const [eventInfoModal, setEventInfoModal] = useState(false)
+  const [eventInfoModal, setEventInfoModal] = useState(false);
 
-  const [events, setEvents] = useState<IEventInfo[]>([])
-  const [todos, setTodos] = useState<ITodo[]>([])
+  const [events, setEvents] = useState<IEventInfo[]>([]);
+  const [sessions, setSessions] = useState<ISession[]>([]);
 
-  const [eventFormData, setEventFormData] = useState<EventFormData>(initialEventFormState)
+  const [eventFormData, setEventFormData] = useState<EventFormData>(
+    initialEventFormState
+  );
 
   const [datePickerEventFormData, setDatePickerEventFormData] =
-    useState<DatePickerEventFormData>(initialDatePickerEventFormData)
+    useState<DatePickerEventFormData>(initialDatePickerEventFormData);
 
   const handleSelectSlot = (event: Event) => {
-    setOpenSlot(true)
-    setCurrentEvent(event)
-  }
+    setOpenSlot(true);
+    setCurrentEvent(event);
+  };
 
   const handleSelectEvent = (event: IEventInfo) => {
-    setCurrentEvent(event)
-    setEventInfoModal(true)
-  }
+    setCurrentEvent(event);
+    setEventInfoModal(true);
+  };
 
   const handleClose = () => {
-    setEventFormData(initialEventFormState)
-    setOpenSlot(false)
-  }
+    setEventFormData(initialEventFormState);
+    setOpenSlot(false);
+  };
 
   const handleDatePickerClose = () => {
-    setDatePickerEventFormData(initialDatePickerEventFormData)
-    setOpenDatepickerModal(false)
-  }
+    setDatePickerEventFormData(initialDatePickerEventFormData);
+    setOpenDatepickerModal(false);
+  };
 
   const onAddEvent = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const data: IEventInfo = {
       ...eventFormData,
       _id: generateId(),
       start: currentEvent?.start,
       end: currentEvent?.end,
-    }
+    };
 
-    const newEvents = [...events, data]
+    const newEvents = [...events, data];
 
-    setEvents(newEvents)
-    handleClose()
-  }
+    setEvents(newEvents);
+    handleClose();
+  };
 
   const onAddEventFromDatePicker = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const addHours = (date: Date | undefined, hours: number) => {
-      return date ? date.setHours(date.getHours() + hours) : undefined
-    }
+      return date ? date.setHours(date.getHours() + hours) : undefined;
+    };
 
     const setMinToZero = (date: any) => {
-      date.setSeconds(0)
+      date.setSeconds(0);
 
-      return date
-    }
+      return date;
+    };
 
     const data: IEventInfo = {
       ...datePickerEventFormData,
@@ -141,18 +155,20 @@ export default function EventCalendar ()  {
       end: datePickerEventFormData.allDay
         ? addHours(datePickerEventFormData.start, 12)
         : setMinToZero(datePickerEventFormData.end),
-    }
+    };
 
-    const newEvents = [...events, data]
+    const newEvents = [...events, data];
 
-    setEvents(newEvents)
-    setDatePickerEventFormData(initialDatePickerEventFormData)
-  }
+    setEvents(newEvents);
+    setDatePickerEventFormData(initialDatePickerEventFormData);
+  };
 
   const onDeleteEvent = () => {
-    setEvents(() => [...events].filter((e) => e._id !== (currentEvent as IEventInfo)._id!))
-    setEventInfoModal(false)
-  }
+    setEvents(() =>
+      [...events].filter((e) => e._id !== (currentEvent as IEventInfo)._id!)
+    );
+    setEventInfoModal(false);
+  };
 
   return (
     <Box
@@ -166,15 +182,32 @@ export default function EventCalendar ()  {
     >
       <Container maxWidth={false}>
         <Card>
-          <CardHeader title="Session Handler" subheader="Organize and Automate Sessions" />
+          <CardHeader
+            title="Session Handler"
+            subheader="Organize and Automate Sessions"
+          />
           <Divider />
           <CardContent>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <ButtonGroup className="" size="large" variant="contained" aria-label="outlined primary button group">
-                <Button className="mr-4" onClick={() => setOpenDatepickerModal(true)} size="small" variant="outlined">
+              <ButtonGroup
+                className=""
+                size="large"
+                variant="contained"
+                aria-label="outlined primary button group"
+              >
+                <Button
+                  className="mr-4"
+                  onClick={() => setOpenDatepickerModal(true)}
+                  size="small"
+                  variant="outlined"
+                >
                   Add Session
                 </Button>
-                <Button onClick={() => setOpenTodoModal(true)} size="small" variant="outlined">
+                <Button
+                  onClick={() => setOpenSessionModal(true)}
+                  size="small"
+                  variant="outlined"
+                >
                   Create Session
                 </Button>
               </ButtonGroup>
@@ -186,7 +219,7 @@ export default function EventCalendar ()  {
               eventFormData={eventFormData}
               setEventFormData={setEventFormData}
               onAddEvent={onAddEvent}
-              todos={todos}
+              sessions={sessions}
             />
             <AddDatePickerEventModal
               open={openDatepickerModal}
@@ -194,7 +227,7 @@ export default function EventCalendar ()  {
               datePickerEventFormData={datePickerEventFormData}
               setDatePickerEventFormData={setDatePickerEventFormData}
               onAddEvent={onAddEventFromDatePicker}
-              todos={todos}
+              sessions={sessions}
             />
             <EventInfoModal
               open={eventInfoModal}
@@ -202,11 +235,11 @@ export default function EventCalendar ()  {
               onDeleteEvent={onDeleteEvent}
               currentEvent={currentEvent as IEventInfo}
             />
-            <AddTodoModal
-              open={openTodoModal}
-              handleClose={() => setOpenTodoModal(false)}
-              todos={todos}
-              setTodos={setTodos}
+            <AddSessionModal
+              open={opneSessionModal}
+              handleClose={() => setOpenSessionModal(false)}
+              sessions={sessions}
+              setSessions={setSessions}
             />
             <Calendar
               localizer={localizer}
@@ -219,13 +252,15 @@ export default function EventCalendar ()  {
               endAccessor="end"
               defaultView="week"
               eventPropGetter={(event) => {
-                const hasTodo = todos.find((todo) => todo._id === event.todoId)
+                const hasSession = sessions.find(
+                  (session) => session._id === event.sessionId
+                );
                 return {
                   style: {
-                    backgroundColor: hasTodo ? hasTodo.color : "#b64fc8",
-                    borderColor: hasTodo ? hasTodo.color : "#b64fc8",
+                    backgroundColor: hasSession ? hasSession.color : "#b64fc8",
+                    borderColor: hasSession ? hasSession.color : "#b64fc8",
                   },
-                }
+                };
               }}
               style={{
                 height: 900,
@@ -235,5 +270,5 @@ export default function EventCalendar ()  {
         </Card>
       </Container>
     </Box>
-  )
+  );
 }
